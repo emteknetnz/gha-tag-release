@@ -149,36 +149,9 @@ runs:
       env:
         TAG: ${{ inputs.tag }}
         RELEASE_DESCRIPTION: ${{ inputs.release_description }}
-        PREVIOUS_TAG: ${{ inputs.previous_tag }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_SHA: ${{ github.sha }}
       run: |
-        # Work out if tag should be marked as "latest release"
-        MAKE_LATEST=false
-        # https://docs.github.com/en/rest/git/tags?apiVersion=2022-11-28
-        RESP_CODE=$(curl -w %{http_code} -s -o __response.json \
-        -X GET https://api.github.com/repos/${GITHUB_REPOSITORY}/tags \
-        -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer ${{ github.token }}" \
-        -H "X-GitHub-Api-Version: 2022-11-28" \
-        )
-        if [[ $RESP_CODE != "200" ]]; then
-          echo "Unable to read list of commits - HTTP response code was $RESP_CODE"
-          exit 1
-        fi
-        # Get the latest tag
-        LATEST_TAG=$(jq -r '.[].name' __response.json | grep -E ^[0-9]+\.[0-9]+\.[0-9]+$ | sort -V -r | head -n 1)
-        if [[ $LATEST_TAG =~ ([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-          MAJOR=${BASH_REMATCH[1]}
-          MINOR=${BASH_REMATCH[2]}
-          PATCH=${BASH_REMATCH[3]}
-          NEXT_TAG="$MAJOR.$MINOR.$((PATCH+1))"
-          if [[ $NEXT_TAG == $TAG ]]; then
-            # At this point we can be sure that we're about the release a semver tag that is
-            # one patch version higher than the latest tag
-            MAKE_LATEST=true
-          fi
-        fi
         # Escape double quotes '"' => '\"'
         RELEASE_DESCRIPTION=${RELEASE_DESCRIPTION//\"/\\\"}
         # Create new release via GitHub API
@@ -197,7 +170,7 @@ runs:
           "draft": false,
           "prerelease": false,
           "generate_release_notes": ${{ inputs.release_auto_notes }},
-          "make_latest": $MAKE_LATEST
+          "make_latest": "legacy"
         }
         EOF
         )
