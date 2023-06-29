@@ -2,21 +2,38 @@
 
 Create a tag and an optional release
 
-## Usage
+### Usage
 
 **workflow.yml**
 ```yml
 steps:
   - name: Create tag and release
-    uses: silverstripe/gha-pull-request@v1
+    uses: silverstripe/gha-tag-release@v1
     with:
       tag: 1.2.3
       release: true
 ```
 
-Read more information about the inputs available for [silverstripe/gha-pull-request](https://github.com/silverstripe/gha-pull-request).
+#### Inputs
 
-## Why there is no SHA input paramater
+##### tag
+The tag to create e.g. 1.2.3
+
+##### delete_existing
+Whether to delete any existing tags or releases that match tag if they exist. Default is false, enable with:
+`delete_existing: true`
+
+##### release
+Whether to create a coresponding release that matches tag
+
+##### release_description
+The description text used for the release - format with markdown
+
+##### release_auto_notes
+Whether to use the github API to auto generate the release which will be appended to `release_description`. Default is false, enable with:
+`release_auto_notes: true`
+
+### Why there is no SHA input paramater
 
 Creating a tag for a particular SHA, either via the GitHub API or via CLI (i.e. git tag) in an action is strangely blocked. The error is "Resource not accessible by integration" which is a permissions error.
 
