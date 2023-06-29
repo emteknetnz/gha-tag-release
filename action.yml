@@ -183,7 +183,8 @@ runs:
         RELEASE_DESCRIPTION=${RELEASE_DESCRIPTION//\"/\\\"}
         # Create new release via GitHub API
         # https://docs.github.com/en/rest/releases/releases#create-a-release
-        RESP_CODE=$(curl -w %{http_code} -s -o /dev/null \
+        # TODO: change __response.json back to /dev/null
+        RESP_CODE=$(curl -w %{http_code} -s -o __response.json \
         -X POST https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
         -H "Accept: application/vnd.github.v3+json" \
         -H "Authorization: token ${{ github.token }}" \
@@ -202,6 +203,7 @@ runs:
         )
         if [[ $RESP_CODE != "201" ]]; then
           echo "Unable to create release for tag $TAG - HTTP response code was $RESP_CODE"
+          cat __response.json
           exit 1
         fi
         echo "New release $TAG created"
