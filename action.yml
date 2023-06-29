@@ -195,7 +195,7 @@ runs:
           "name": "$TAG",
           "body": "$RELEASE_DESCRIPTION",
           "draft": false,
-          "prerelease": false
+          "prerelease": false,
           "generate_release_notes": ${{ inputs.release_auto_notes }},
           "make_latest": $MAKE_LATEST
         }
