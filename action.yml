@@ -158,8 +158,9 @@ runs:
         # https://docs.github.com/en/rest/releases/releases#create-a-release
         RESP_CODE=$(curl -w %{http_code} -s -o /dev/null \
         -X POST https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
-        -H "Accept: application/vnd.github.v3+json" \
-        -H "Authorization: token ${{ github.token }}" \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: ${{ github.token }}" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \        
         -d @- << EOF
         {
           "tag_name": "$TAG",
